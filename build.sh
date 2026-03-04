@@ -40,9 +40,9 @@ mkdir -p ${PWD}/output/${TARGET_TRIPLET}_gcc${GCC}
 # Build
 #
 ###############################################################################
-export CT_PREFIX="${PWD}/output/${TARGET_TRIPLET}_gcc${GCC}"
-DEFCONFIG=configs/${TARGET_TRIPLET}_gcc${GCC} ct-ng defconfig
-ct-ng -j$(nproc) build
+# export CT_PREFIX="${PWD}/output/${TARGET_TRIPLET}_gcc${GCC}"
+# DEFCONFIG=configs/${TARGET_TRIPLET}_gcc${GCC} ct-ng defconfig
+# ct-ng -j$(nproc) build
 
 ###############################################################################
 #
@@ -56,6 +56,14 @@ function get_commit_time() {
 }
 
 SOURCE_EPOCH=$get_commit_time
+
+
+chmod -R a+w output/${TARGET_TRIPLET}_gcc${GCC}/
+cp third_party/aborts_upon_exceptiion/libs/linux/${ARCH}/libabortsuponexception.a output/${TARGET_TRIPLET}_gcc${GCC}/${TARGET_TRIPLET}/${TARGET_TRIPLET}/sysroot/lib/
+cp third_party/aborts_upon_exceptiion/libs/linux/${ARCH}/libabortsuponexception.so output/${TARGET_TRIPLET}_gcc${GCC}/${TARGET_TRIPLET}/${TARGET_TRIPLET}/sysroot/lib/
+ln -s ../../${TARGET_TRIPLET}/sysroot/lib64/libabortsuponexception.a output/${TARGET_TRIPLET}_gcc${GCC}/${TARGET_TRIPLET}/${TARGET_TRIPLET}/lib64/libabortsuponexception.a
+ln -s ../../${TARGET_TRIPLET}/sysroot/lib64/libabortsuponexception.so output/${TARGET_TRIPLET}_gcc${GCC}/${TARGET_TRIPLET}/${TARGET_TRIPLET}/lib64/libabortsuponexception.so
+chmod -R a-w output/${TARGET_TRIPLET}_gcc${GCC}/
 
 tar -c \
     --sort=name \
