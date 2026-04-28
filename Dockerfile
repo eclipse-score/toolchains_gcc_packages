@@ -28,8 +28,10 @@ RUN { echo 'tzdata tzdata/Areas select Etc'; echo 'tzdata tzdata/Zones/Etc selec
 RUN apt-get update && apt-get install -y \
     autoconf \
     automake \
+    autopoint \
     bison \
     bzip2 \
+    curl \
     flex \
     g++ \
     gawk \
@@ -37,14 +39,15 @@ RUN apt-get update && apt-get install -y \
     git \
     gperf \
     help2man \
-    libncurses5-dev \
-    libstdc++6 \
+    libncurses-dev \
     libtool \
     libtool-bin \
     make \
     meson \
     ninja-build \
     patch \
+    pkg-config \
+    python3 \
     python3-dev \
     rsync \
     texinfo \
