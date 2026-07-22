@@ -14,5 +14,6 @@
 # TC Generator
 .build
 .config
+.local
 build.log
 /output

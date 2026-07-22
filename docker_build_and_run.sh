@@ -18,7 +18,7 @@ set -e
 REPO="ctng-image"
 
 # Define the tag name (set Crosstool-NG version)
-TAG="1.27.0"
+TAG="1.28.0"
 
 # Define the full name (e.g. "ctng-image:1.27.0")
 FULL_IMAGE_NAME="${REPO}:${TAG}"
