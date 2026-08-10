@@ -22,6 +22,35 @@ https://www.apache.org/licenses/LICENSE-2.0.
 
 SPDX-License-Identifier: Apache-2.0
 
+## Third-Party Components in Distributed Toolchain Packages
+
+The pre-built toolchain archives (`.tar.gz`) produced by this project contain
+binaries and headers derived from the following third-party open-source
+projects. Their license texts are bundled inside each archive under
+`<target-triplet>/share/licenses/`.
+
+| Component     | License        | Upstream source |
+|---------------|----------------|-----------------|
+| GCC           | GPL-3.0-only (compiler binaries); GPL-3.0-only WITH GCC-exception-3.1 (runtime libraries) | https://gcc.gnu.org |
+| binutils      | GPL-3.0-or-later | https://www.gnu.org/software/binutils |
+| glibc         | LGPL-2.1-or-later | https://www.gnu.org/software/libc |
+| Linux headers | GPL-2.0-only WITH Linux-syscall-note | https://www.kernel.org |
+| GMP           | LGPL-3.0-or-later | https://gmplib.org |
+| MPFR          | LGPL-3.0-or-later | https://www.mpfr.org |
+| MPC           | LGPL-3.0-or-later | https://www.multiprecision.org/mpc |
+| ISL           | MIT            | https://libisl.sourceforge.io |
+| zlib          | Zlib           | https://zlib.net |
+| zstd          | BSD-3-Clause AND GPL-2.0-only | https://github.com/facebook/zstd |
+| crosstool-NG  | GPL-2.0-only   | https://crosstool-ng.github.io |
+
+These components are not modified by this project. The full corresponding
+source code is available at the upstream URLs listed above.
+
+Recipients of the compiled toolchain who redistribute it further must comply
+with the respective licenses of each component, in particular the GPL and LGPL
+obligations regarding source availability and (for LGPL) the right to relink
+with modified library versions.
+
 ## Cryptography
 
 Content may contain encryption software. The country in which you are currently
