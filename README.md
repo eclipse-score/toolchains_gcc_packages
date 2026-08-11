@@ -1,12 +1,12 @@
 # toolchains_gcc_packages
 
-This repository builds packaged GNU toolchains with Crosstool-NG and emits versioned tarballs under `output/`. The current repository state is focused on GCC 12 toolchains for Linux targets and includes the configuration, container image, and checksum override needed to reproduce those builds.
+This repository builds packaged GNU toolchains with Crosstool-NG and emits versioned tarballs under `output/`. It produces toolchains for GCC 12 and GCC 15 on `x86_64` and `aarch64` Linux targets, and includes the configuration, container image, per-package checksum overrides, and any backported security patches needed to reproduce those builds.
 
 ## What This Repository Does
 
 The build flow has three parts:
 
-1. `Dockerfile` creates a build image with Crosstool-NG 1.27.0 and the host dependencies needed to run `ct-ng`.
+1. `Dockerfile` creates a build image with Crosstool-NG 1.28.0 and the host dependencies needed to run `ct-ng`.
 2. `docker_build_and_run.sh` builds that image and launches `build.sh` inside the container with the requested architecture and GCC major version.
 3. `build.sh` runs `ct-ng defconfig` and `ct-ng build`, then packages the generated toolchain into a `.tar.gz` archive plus a SHA-256 checksum file.
 
@@ -16,20 +16,24 @@ The result is a redistributable toolchain archive rooted at the target triplet, 
 
 The checked-in target configurations currently cover:
 
-| Target triplet | `ARCH` value | Config file |
+| Target triplet | `ARCH` value | GCC | Config file |
+| --- | --- | --- | --- |
+| `x86_64-unknown-linux-gnu` | `x86_64` | 12 | `configs/x86_64-unknown-linux-gnu_gcc12` |
+| `x86_64-unknown-linux-gnu` | `x86_64` | 15 | `configs/x86_64-unknown-linux-gnu_gcc15` |
+| `aarch64-unknown-linux-gnu` | `arm64` or `aarch64` | 12 | `configs/aarch64-unknown-linux-gnu_gcc12` |
+| `aarch64-unknown-linux-gnu` | `arm64` or `aarch64` | 15 | `configs/aarch64-unknown-linux-gnu_gcc15` |
+
+All configs are pinned to the following component versions:
+
+| Component | GCC 12 toolchains | GCC 15 toolchains |
 | --- | --- | --- |
-| `x86_64-unknown-linux-gnu` | `x86_64` | `configs/x86_64-unknown-linux-gnu_gcc12` |
-| `aarch64-unknown-linux-gnu` | `arm64` or `aarch64` | `configs/aarch64-unknown-linux-gnu_gcc12` |
+| Crosstool-NG | `1.28.0` | `1.28.0` |
+| GCC | `12.2.0` | `15.3.0` |
+| Linux headers | `5.15` | `7.1.4` |
+| binutils | `2.34` | `2.46.1` |
+| glibc | `2.31` | `2.39` |
 
-Those configs are pinned to the following major component versions:
-
-- Crosstool-NG `1.27.0`
-- GCC `12.2.0`
-- Linux headers `5.15`
-- binutils `2.34`
-- glibc `2.31`
-
-Both committed configs enable C++ support and build a static toolchain.
+All configs enable C++ support and build a static toolchain.
 
 ## Repository Layout
 
@@ -37,7 +41,7 @@ Both committed configs enable C++ support and build a static toolchain.
 - `docker_build_and_run.sh`: recommended wrapper for local and CI builds.
 - `Dockerfile`: reproducible build environment for Crosstool-NG.
 - `configs/`: one Crosstool-NG defconfig per supported target/GCC combination.
-- `12.2.0/chksum`: checksum override copied into the container so Crosstool-NG accepts GCC `12.2.0` package metadata.
+- `additional_packages/`: per-component overrides (checksums, `version.desc`, patches) copied into the container's Crosstool-NG package tree.
 - `output/`: generated source download cache, intermediate build trees, unpacked toolchains, final archives, and `.sha256` files.
 
 ## Recommended Build: Docker
@@ -52,39 +56,39 @@ Docker is the canonical way to build because the image pins the Crosstool-NG ver
 
 ### Commands
 
-Build the default x86_64 toolchain:
+Build the x86_64 GCC 12 toolchain:
 
 ```bash
-./docker_build_and_run.sh
+./docker_build_and_run.sh x86_64 12
 ```
 
-Build the aarch64 toolchain:
+Build the x86_64 GCC 15 toolchain:
 
 ```bash
-./docker_build_and_run.sh arm64
+./docker_build_and_run.sh x86_64 15
 ```
 
-Pass both architecture and GCC major version explicitly:
+Build the aarch64 GCC 15 toolchain:
 
 ```bash
-./docker_build_and_run.sh aarch64 12
+./docker_build_and_run.sh aarch64 15
 ```
 
 The wrapper script:
 
-- builds the local image `ctng-image:1.27.0`
+- builds the local image `ctng-image:1.28.0`
 - mounts the repository into `/workspace` inside the container
 - runs `GCC=<version> ARCH=<arch> ./build.sh`
 - preserves file ownership on the host with `--user "$(id -u):$(id -g)"`
 
 ## Manual Build
 
-Manual builds are possible, but `build.sh` assumes `ct-ng` is already installed and compatible with the checked-in configs. In practice that means matching the container setup closely, especially Crosstool-NG `1.27.0` and the GCC `12.2.0` checksum override.
+Manual builds are possible, but `build.sh` assumes `ct-ng` is already installed and compatible with the checked-in configs. In practice that means matching the container setup closely, especially Crosstool-NG `1.28.0` and the per-package checksum overrides in `additional_packages/`.
 
 At minimum:
 
 ```bash
-export GCC=12
+export GCC=15   # or 12
 export ARCH=x86_64
 ./build.sh
 ```
@@ -137,6 +141,12 @@ configs/<target-triplet>_gcc<major>
 ```
 
 The build scripts derive the target triplet and output paths from that naming scheme, so keeping it consistent avoids additional script changes.
+
+## Releases
+
+Releases are published to GitHub Releases via the CI pipeline (`.github/workflows/release.yml`). Pushing a `v*` tag builds all four target/GCC combinations in parallel and attaches the resulting `.tar.gz` and `.sha256` files to the release.
+
+Each release archive contains the bundled license texts for all third-party components under `<target-triplet>/share/licenses/`. See `NOTICE` for the full list of components and their upstream source locations.
 
 ## License
 
