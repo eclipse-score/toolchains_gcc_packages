@@ -9,57 +9,85 @@ permissions:
   contents: write
 
 jobs:
-  build-x86_64:
+  build-x86_64-gcc12:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Build x86_64 toolchain
-        run: ./docker_build_and_run.sh x86_64
-      
-      - name: Upload x86_64 artifacts
+
+      - name: Build x86_64 gcc12 toolchain
+        run: ./docker_build_and_run.sh x86_64 12
+
+      - name: Upload x86_64 gcc12 artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: x86_64-artifacts
+          name: x86_64-gcc12-artifacts
           path: output/x86_64-unknown-linux-gnu_gcc12.tar.gz*
           if-no-files-found: error
 
-  build-aarch64:
+  build-x86_64-gcc15:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Build aarch64 toolchain
-        run: ./docker_build_and_run.sh aarch64
-      
-      - name: Upload aarch64 artifacts
+
+      - name: Build x86_64 gcc15 toolchain
+        run: ./docker_build_and_run.sh x86_64 15
+
+      - name: Upload x86_64 gcc15 artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: aarch64-artifacts
+          name: x86_64-gcc15-artifacts
+          path: output/x86_64-unknown-linux-gnu_gcc15.tar.gz*
+          if-no-files-found: error
+
+  build-aarch64-gcc12:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build aarch64 gcc12 toolchain
+        run: ./docker_build_and_run.sh aarch64 12
+
+      - name: Upload aarch64 gcc12 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: aarch64-gcc12-artifacts
           path: output/aarch64-unknown-linux-gnu_gcc12.tar.gz*
           if-no-files-found: error
 
+  build-aarch64-gcc15:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build aarch64 gcc15 toolchain
+        run: ./docker_build_and_run.sh aarch64 15
+
+      - name: Upload aarch64 gcc15 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: aarch64-gcc15-artifacts
+          path: output/aarch64-unknown-linux-gnu_gcc15.tar.gz*
+          if-no-files-found: error
+
   release:
-    needs: [build-x86_64, build-aarch64]
+    needs: [build-x86_64-gcc12, build-x86_64-gcc15, build-aarch64-gcc12, build-aarch64-gcc15]
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts/
-      
+
       - name: Prepare release artifacts
         run: |
-          # Create dist directory for final artifacts
           mkdir -p dist
-          
-          # Move all artifacts to dist
-          cp artifacts/x86_64-artifacts/* dist/
-          cp artifacts/aarch64-artifacts/* dist/
-          
+          cp artifacts/x86_64-gcc12-artifacts/* dist/
+          cp artifacts/x86_64-gcc15-artifacts/* dist/
+          cp artifacts/aarch64-gcc12-artifacts/* dist/
+          cp artifacts/aarch64-gcc15-artifacts/* dist/
           echo "Release artifacts:"
           ls -la dist/
-      
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
