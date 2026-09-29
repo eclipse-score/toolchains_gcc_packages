@@ -43,8 +43,20 @@ projects. Their license texts are bundled inside each archive under
 | zstd          | BSD-3-Clause AND GPL-2.0-only | https://github.com/facebook/zstd |
 | crosstool-NG  | GPL-2.0-only   | https://crosstool-ng.github.io |
 
-These components are not modified by this project. The full corresponding
-source code is available at the upstream URLs listed above.
+Most of these components are unmodified upstream releases. The following
+components carry additional patches applied by this project on top of the
+upstream release identified above; the patches themselves are tracked in
+`additional_packages/<component>/<version>/` in this repository's source
+control history, which constitutes part of the Corresponding Source for the
+patched components:
+
+| Component | Patched version | Patches |
+|-----------|------------------|---------|
+| binutils  | 2.46.1 | `check_ldrunpath_length`, drop unneeded `libfl` link, sysroot lookup order |
+
+For all other components, no source modifications are made and the full
+corresponding source code is available unmodified at the upstream URLs listed
+above.
 
 Recipients of the compiled toolchain who redistribute it further must comply
 with the respective licenses of each component, in particular the GPL and LGPL
