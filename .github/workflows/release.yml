@@ -12,7 +12,7 @@ jobs:
   build-x86_64-gcc12:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build x86_64 gcc12 toolchain
         run: ./docker_build_and_run.sh x86_64 12
@@ -27,7 +27,7 @@ jobs:
   build-x86_64-gcc15:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build x86_64 gcc15 toolchain
         run: ./docker_build_and_run.sh x86_64 15
@@ -42,7 +42,7 @@ jobs:
   build-aarch64-gcc12:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build aarch64 gcc12 toolchain
         run: ./docker_build_and_run.sh aarch64 12
@@ -57,7 +57,7 @@ jobs:
   build-aarch64-gcc15:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build aarch64 gcc15 toolchain
         run: ./docker_build_and_run.sh aarch64 15
